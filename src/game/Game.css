@@ -1,0 +1,100 @@
+body {
+  font-family: 'Archivo Narrow', sans-serif;
+  background-color: #222;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#game-layout {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1300px;
+  align-self: center;
+}
+
+#game-layout>* {
+  width: 100%;
+}
+
+#options>* {
+  width: 100%;
+}
+
+#game-content>p {
+  font-size: 2.3rem;
+  background-color: #d4b99d;
+  padding: 1.4rem 1.5rem;
+  color: #342514;
+}
+
+#options {
+  display: flex;
+  flex-direction: column;
+}
+
+#options button {
+  display: block;
+  margin: 10px auto;
+  padding: 14px 5px 14px 79px;
+  font-size: 2rem;
+  background-image: linear-gradient(to bottom right, #785623 0%, #553e1c 100%);
+  border: none;
+  color: white;
+  letter-spacing: -0.05rem;
+  text-shadow: -1.5px -1.5px 0 black, 1.5px -1.5px 0 black, -1.5px 1.5px 0 black, 1.5px 1.5px 0 black;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-family: 'Archivo Narrow', sans-serif;
+  width: 100%;
+
+}
+
+#options button:hover {
+  border-width: 0;
+  border-style: solid;
+  position: relative;
+}
+
+#options button:hover::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  background-image: linear-gradient(to bottom right, #f19954 0%, #9b3327 100%);
+  z-index: -1;
+  border-radius: 5px;
+  filter: blur(2px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media screen and (max-width: 480px) {
+  #game-content>p {
+    font-size: 1.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  #options button {
+    font-size: 1.3rem;
+    padding: 0.6rem 1rem;
+  }
+}
