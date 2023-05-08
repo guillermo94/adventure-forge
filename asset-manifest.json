@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/adventure-forge/static/css/main.850b33e5.css",
+    "main.js": "/adventure-forge/static/js/main.f618a07d.js",
+    "index.html": "/adventure-forge/index.html",
+    "main.850b33e5.css.map": "/adventure-forge/static/css/main.850b33e5.css.map",
+    "main.f618a07d.js.map": "/adventure-forge/static/js/main.f618a07d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.850b33e5.css",
+    "static/js/main.f618a07d.js"
+  ]
+}
