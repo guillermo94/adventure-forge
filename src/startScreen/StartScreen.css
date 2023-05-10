@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English&display=swap');
+
+#play-button {
+    display: block;
+    padding: 3px;
+    font-size: 1.5rem;
+    background-image: linear-gradient(to bottom right, #785623 0%, #553e1c 100%);
+    border: none;
+    color: white;
+    letter-spacing: -0.05rem;
+    text-shadow: -1.5px -1.5px 0 black, 1.5px -1.5px 0 black, -1.5px 1.5px 0 black, 1.5px 1.5px 0 black;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Archivo Narrow', sans-serif;
+}
+
+#token-form {
+    display: flex;
+    justify-content: center;
+}
+
+/* 
+body {
+    font-family: 'IM Fell English', serif;
+    background-color: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+} */
+
+#welcome-message {
+    font-family: 'IM Fell English', serif;
+    font-size: 5rem;
+    text-align: center;
+    font-weight: 600;
+    background-image: linear-gradient(135deg, #553e1c, #d4b99d);
+    -webkit-background-clip: text;
+    color: transparent;
+    padding: 20px;
+    animation: fadeIn 3s ease-in-out infinite alternate;
+}
+
+@media screen and (max-width: 480px) {
+    #welcome-message {
+        font-size: 3rem;
+    }
+}
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

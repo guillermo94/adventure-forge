@@ -1,21 +1,97 @@
 import React, { useRef, useEffect, useState } from "react";
-import { useTranslation } from "../language/LanguageContext";
+import { useLanguage, useTranslation } from "../language/LanguageContext";
 import "./Game.css";
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 
 interface GameProps {
   userToken: string;
 }
 
+
+function splitTextIntoChunks(text, maxChunkSize) {
+  const words = text.split(' ');
+  const chunks = [];
+  let currentChunk = '';
+
+  words.forEach(word => {
+    if (currentChunk.length + word.length <= maxChunkSize) {
+      currentChunk += ' ' + word;
+    } else {
+      chunks.push(currentChunk.trim());
+      currentChunk = word;
+    }
+  });
+
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks;
+}
+
+const speak = (text: string, voice: SpeechSynthesisVoice) => {
+  // Limpiar el array de utterances
+  window.utterances = [];
+
+  // Dividir el texto en fragmentos, sin dividir las palabras a la mitad
+  const maxChunkSize = 120;
+  const textChunks = splitTextIntoChunks(text, maxChunkSize);
+
+  // Función para hablar un fragmento y programar el siguiente fragmento
+  const speakChunk = (index: number) => {
+    if (index < textChunks.length) {
+      const utterance = new SpeechSynthesisUtterance(textChunks[index]);
+      utterance.voice = voice; // Establecer la voz en la instancia de SpeechSynthesisUtterance
+      window.utterances.push(utterance);
+
+      utterance.onend = () => {
+        speakChunk(index + 1);
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Iniciar la narración
+  speakChunk(0);
+};
+
+
 const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
 
-  const gameContent = useRef(null);
   const option1 = useRef(null);
   const option2 = useRef(null);
   const option3 = useRef(null);
   const spinner = useRef(null);
   const options = useRef(null);
   const { t } = useTranslation();
+  const { language } = useLanguage();
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
+
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [gameContent, setGameContent] = useState<string[]>([]);
+
+  const updateVoices = () => {
+    const availableVoices = window.speechSynthesis.getVoices();
+    setVoices(availableVoices);
+    if (availableVoices.length > 0) {
+      setVoicesLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    window.speechSynthesis.addEventListener("voiceschanged", updateVoices);
+    updateVoices(); // Llama a updateVoices una vez al inicio
+
+    return () => {
+      // Limpia el eventListener al desmontar el componente
+      window.speechSynthesis.removeEventListener("voiceschanged", updateVoices);
+    };
+  }, []);
+
+  const selectedVoice = voices.find((voice) => voice.lang.startsWith(language));
 
   const getRandomType = () => {
     const generos = [t("fantasy"), t("scifi"), t("horror")];
@@ -31,6 +107,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
       content: t("game_history_content", { gameType: gameType }),
     },
   ]);
+
 
 
   function toggleSpinner(visible) {
@@ -95,8 +172,18 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
     );
 
     const { options: introOptions, newText } = extractOptions(introText);
-    gameContent.current.innerHTML = `<p>${newText}</p>`;
+    setGameContent((prev) => [...prev, newText]);
 
+    if (!voicesLoaded) {
+      const checkVoicesInterval = setInterval(() => {
+        if (voicesLoaded) {
+          clearInterval(checkVoicesInterval);
+          speak(newText, selectedVoice);
+        }
+      }, 100);
+    } else {
+      speak(newText, selectedVoice);
+    }
     for (let i = 0; i < 3; i++) {
       const optionButton = [option1, option2, option3][i].current;
       if (introOptions[i]) {
@@ -129,7 +216,9 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
       console.error('No se encontraron exactamente 3 opciones en la respuesta de ChatGPT');
     }
 
-    gameContent.current.innerHTML += `<p>${newText}</p>`;
+    setGameContent((prev) => [...prev, newText]);
+    speak(newText, selectedVoice)
+
     setGameHistory((prevHistory) =>
       prevHistory.concat(
         { role: "user", content: prompt },
@@ -139,7 +228,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
     toggleSpinner(false);
 
     if (response.toLowerCase().includes("fin de la aventura")) {
-      gameContent.current.innerHTML += `<p>Fin del juego. Reinicia para jugar de nuevo.</p>`;
+      setGameContent((prev) => [...prev, `<p>Fin del juego. Reinicia para jugar de nuevo.</p>`]);
       option1.current.disabled = true;
       option2.current.disabled = true;
       option3.current.disabled = true;
@@ -198,12 +287,17 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   }
 
   function resetGame() {
+    window.speechSynthesis.cancel(); // Detiene cualquier habla en curso
     toggleOptions(false);
-    gameContent.current.innerHTML = "";
+    setGameContent([]);
     setGameType(getRandomType());
     setGameHistory([
-      { role: "system", content: "Eres un narrador de un juego de 'Elige Tu Propia Aventura'. Ayuda al jugador a navegar por el universo de Dragones y Mazmorras." },
+      {
+        role: "system",
+        content: t("game_history_content", { gameType: gameType }),
+      },
     ]);
+
     option1.current.disabled = false;
     option2.current.disabled = false;
     option3.current.disabled = false;
@@ -211,13 +305,36 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   }
 
   useEffect(() => {
-    startGame();
+    initializeGame();
   }, []);
 
+  useEffect(() => {
+    initializeGame();
+  }, [voicesLoaded]);
+
+  const initializeGame = () => {
+    if (voicesLoaded) {
+      startGame();
+    }
+  };
   return (
     <>
-      <div ref={gameContent} id="game-content"></div>
-      <div ref={spinner} className="spinner hidden">Cargando...</div>
+      <Carousel
+        showArrows={true}
+        showStatus={false}
+        showThumbs={false}
+        showIndicators={false}
+        infiniteLoop={false}
+        selectedItem={gameContent.length - 1}
+
+      >
+        {gameContent.map((item, index) => (
+          <div id="game-content" key={index}>
+            <p >{item}</p>
+          </div>
+        ))}
+      </Carousel>
+      <div ref={spinner} className="spinner">Forjando...</div>
       <div ref={options} id="options" className="hidden">
         <button ref={option1} onClick={() => sendChoice(1)}>Opción 1</button>
         <button ref={option2} onClick={() => sendChoice(2)}>Opción 2</button>

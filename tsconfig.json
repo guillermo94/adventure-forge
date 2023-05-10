@@ -7,20 +7,21 @@
       "esnext"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
+    "skipLibCheck": false,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "resolveJsonModule": false,
+    "isolatedModules": false,
+    "noEmit": false,
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "global.d.ts"
   ]
 }

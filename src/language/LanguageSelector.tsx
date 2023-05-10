@@ -1,27 +1,37 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { ReactComponent as SpanishFlag } from '../resources/ES.svg'; // Reemplaza con la ruta correcta
+import { ReactComponent as EnglishFlag } from '../resources/GB.svg'; // Reemplaza con la ruta correcta
+import './LanguageSelector.css';
 
 interface LanguageSelectorProps {
     onLanguageChange: (language: string) => void;
 }
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageChange }) => {
-    const [selectedLanguage, setSelectedLanguage] = useState('en');
 
-    const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newLanguage = e.target.value;
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageChange }) => {
+    const [selectedLanguage, setSelectedLanguage] = React.useState('en');
+
+    const handleLanguageChange = (newLanguage: string) => {
         setSelectedLanguage(newLanguage);
         onLanguageChange(newLanguage);
     };
+
     return (
         <>
-            <label htmlFor="language">Elige el idioma del juego:</label>
-            <select
-                id="language"
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
-            >
-                <option value="en">Inglés</option>
-                <option value="es">Español</option>
-            </select>
+            <p>Elige el idioma del juego:</p>
+            <div className="language-selector">
+                <div
+                    onClick={() => handleLanguageChange('en')}
+                    className={`flag ${selectedLanguage === 'en' ? 'selected' : ''}`}
+                >
+                    <EnglishFlag />
+                </div>
+                <div
+                    onClick={() => handleLanguageChange('es')}
+                    className={`flag ${selectedLanguage === 'es' ? 'selected' : ''}`}
+                >
+                    <SpanishFlag />
+                </div>
+            </div>
         </>
     );
 };

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Game from "../game/Game";
 import { useTranslation } from "../language/LanguageContext";
 import LanguageSelector from "../language/LanguageSelector";
+import "./StartScreen.css";
 
 const StartScreen = (): React.ReactElement => {
     const [gameStarted, setGameStarted] = useState(false);
@@ -17,22 +18,21 @@ const StartScreen = (): React.ReactElement => {
     }
     return (
         <div className="App">
-            <h1>{t("welcome")}</h1>
             {!gameStarted ? (
-                <div className="token-form">
-                    <h1>Ingrese su token de API de OpenAI</h1>
-                    <form onSubmit={handleTokenSubmit}>
-                        <input
-                            type="text"
-                            value={userToken}
-                            onChange={handleTokenChange}
-                            placeholder="Ingrese su token aquí"
-                            required
-                        />
-                        <button type="submit">{t("play")}</button>
-                    </form>
-                    <LanguageSelector onLanguageChange={setLanguage} />
-                </div>
+                <>
+                    <div id="welcome-message">{t("welcome")}</div><div className="token-form-container">
+                        <div>Ingrese su token de API de OpenAI</div>
+                        <form onSubmit={handleTokenSubmit} id="token-form">
+                            <input
+                                type="text"
+                                value={userToken}
+                                onChange={handleTokenChange}
+                                placeholder="Ingrese su token aquí"
+                                required />
+                            <button id="play-button" type="submit">{t("play")}</button>
+                        </form>
+                        <LanguageSelector onLanguageChange={setLanguage} />
+                    </div></>
             ) : (
                 <Game userToken={userToken} />
             )}
