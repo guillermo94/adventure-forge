@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.css": "/adventure-forge/static/css/main.850b33e5.css",
-    "main.js": "/adventure-forge/static/js/main.f618a07d.js",
+    "main.css": "/adventure-forge/static/css/main.05ac780a.css",
+    "main.js": "/adventure-forge/static/js/main.aa0ea863.js",
+    "static/media/ES.svg": "/adventure-forge/static/media/ES.e3db1b5f8a2ec8ae87640f32237c01b3.svg",
     "index.html": "/adventure-forge/index.html",
-    "main.850b33e5.css.map": "/adventure-forge/static/css/main.850b33e5.css.map",
-    "main.f618a07d.js.map": "/adventure-forge/static/js/main.f618a07d.js.map"
+    "static/media/GB.svg": "/adventure-forge/static/media/GB.516897fd3988e35032b772b026a19f75.svg",
+    "main.05ac780a.css.map": "/adventure-forge/static/css/main.05ac780a.css.map",
+    "main.aa0ea863.js.map": "/adventure-forge/static/js/main.aa0ea863.js.map"
   },
   "entrypoints": [
-    "static/css/main.850b33e5.css",
-    "static/js/main.f618a07d.js"
+    "static/css/main.05ac780a.css",
+    "static/js/main.aa0ea863.js"
   ]
 }
