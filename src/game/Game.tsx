@@ -221,15 +221,15 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
       }),
     };
     try {
-      const data = { "id": "chatcmpl-7Dty0ia7TwnFjzH0qS5tYqp4vev1A", "object": "chat.completion", "created": 1683547756, "model": "gpt-3.5-turbo-0301", "usage": { "prompt_tokens": 155, "completion_tokens": 112, "total_tokens": 267 }, "choices": [{ "message": { "role": "assistant", "content": "Te encuentras en una nave espacial en el año 2050, eres parte de una misión para explorar nuevos planetas y encontrar posibles lugares donde puedan vivir los humanos. De pronto, la nave empieza a sacudirse y escuchas una alarma sonar. Tienes que tomar una decisión:\n\n1) Ir a investigar el origen de la alarma\n2) Pedir ayuda al equipo\n3) Permanecer en tu lugar y esperar a que alguien te diga qué hacer" }, "finish_reason": "stop", "index": 0 }] }
+      // const data = { "id": "chatcmpl-7Dty0ia7TwnFjzH0qS5tYqp4vev1A", "object": "chat.completion", "created": 1683547756, "model": "gpt-3.5-turbo-0301", "usage": { "prompt_tokens": 155, "completion_tokens": 112, "total_tokens": 267 }, "choices": [{ "message": { "role": "assistant", "content": "Te encuentras en una nave espacial en el año 2050, eres parte de una misión para explorar nuevos planetas y encontrar posibles lugares donde puedan vivir los humanos. De pronto, la nave empieza a sacudirse y escuchas una alarma sonar. Tienes que tomar una decisión:\n\n1) Ir a investigar el origen de la alarma\n2) Pedir ayuda al equipo\n3) Permanecer en tu lugar y esperar a que alguien te diga qué hacer" }, "finish_reason": "stop", "index": 0 }] }
 
       // Uncomment this to make the proper call
-      // const response = await fetch(url, requestOptions);
-      // if (response.status === 429) {
-      //   console.error("Error 429: Límite de velocidad alcanzado");
-      //   return "Lo siento, se ha alcanzado el límite de solicitudes permitidas en este momento. Por favor, intenta de nuevo más tarde.";
-      // }
-      // const data = await response.json();
+      const response = await fetch(url, requestOptions);
+      if (response.status === 429) {
+        console.error("Error 429: Límite de velocidad alcanzado");
+        return "Lo siento, se ha alcanzado el límite de solicitudes permitidas en este momento. Por favor, intenta de nuevo más tarde.";
+      }
+      const data = await response.json();
       const output = data.choices[0].message.content.trim();
 
       if (addToHistory) {
