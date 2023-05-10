@@ -34,7 +34,7 @@ function splitTextIntoChunks(text, maxChunkSize) {
 const speak = (text: string, voice: SpeechSynthesisVoice) => {
   // Limpiar el array de utterances
   window.utterances = [];
-
+  speechSynthesis.cancel();
   // Dividir el texto en fragmentos, sin dividir las palabras a la mitad
   const maxChunkSize = 120;
   const textChunks = splitTextIntoChunks(text, maxChunkSize);
@@ -66,6 +66,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   const option3 = useRef(null);
   const spinner = useRef(null);
   const options = useRef(null);
+  const gameCarousel = useRef(null);
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [voicesLoaded, setVoicesLoaded] = useState(false);
@@ -112,6 +113,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
 
   function toggleSpinner(visible) {
     spinner.current.classList.toggle("hidden", !visible);
+    gameCarousel.current.classList.toggle("hidden", visible);
   }
 
   function toggleOptions(visible: boolean) {
@@ -319,27 +321,28 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   };
   return (
     <>
-      <Carousel
-        showArrows={true}
-        showStatus={false}
-        showThumbs={false}
-        showIndicators={false}
-        infiniteLoop={false}
-        selectedItem={gameContent.length - 1}
-
-      >
-        {gameContent.map((item, index) => (
-          <div id="game-content" key={index}>
-            <p >{item}</p>
-          </div>
-        ))}
-      </Carousel>
-      <div ref={spinner} className="spinner">Forjando...</div>
+      <div ref={gameCarousel}>
+        <Carousel
+          showArrows={true}
+          showStatus={false}
+          showThumbs={false}
+          showIndicators={false}
+          infiniteLoop={false}
+          selectedItem={gameContent.length - 1}
+        >
+          {gameContent.map((item, index) => (
+            <div id="game-content" key={index}>
+              <p >{item}</p>
+            </div>
+          ))}
+        </Carousel>
+      </div>
+      <div ref={spinner} className="spinner">{t('loadingText')}</div>
       <div ref={options} id="options" className="hidden">
         <button ref={option1} onClick={() => sendChoice(1)}>Opción 1</button>
         <button ref={option2} onClick={() => sendChoice(2)}>Opción 2</button>
         <button ref={option3} onClick={() => sendChoice(3)}>Opción 3</button>
-        <button onClick={resetGame}>Reiniciar</button>
+        <button onClick={resetGame}>{t('reset')}</button>
       </div>
     </>
   );

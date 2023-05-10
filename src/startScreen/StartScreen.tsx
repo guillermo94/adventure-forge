@@ -16,6 +16,10 @@ const StartScreen = (): React.ReactElement => {
         event.preventDefault();
         setGameStarted(true);
     }
+    // Limpiar el array de utterances
+    window.utterances = [];
+    speechSynthesis.cancel();
+
     return (
         <div className="App">
             {!gameStarted ? (

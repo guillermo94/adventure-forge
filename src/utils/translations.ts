@@ -16,7 +16,9 @@ const translations = {
         fantasy: "a Dungeons & Dragons universe",
         scifi: "a Star Wars-like universe",
         horror: "a horror universe",
-        play: "Play"
+        play: "Play",
+        loadingText: "Forging...",
+        reset: "Reset"
     },
     es: {
         welcome: "Bienvenido a AdventureForge",
@@ -29,7 +31,9 @@ const translations = {
         fantasy: " el universo de Dragones y Mazmorras",
         scifi: " un universo tipo Star wars",
         horror: " un universo de Terror",
-        play: "Jugar"
+        play: "Jugar",
+        loadingText: "Forjando...",
+        reset: "Reiniciar"
     },
 };
 
