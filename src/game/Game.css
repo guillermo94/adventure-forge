@@ -121,3 +121,8 @@ button:disabled {
   perspective: 1000px;
   transform-origin: 50% 100%;
 }
+
+.tools-buttons-container {
+  display: flex;
+  justify-content: space-between;
+}

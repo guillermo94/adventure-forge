@@ -3,61 +3,13 @@ import { useLanguage, useTranslation } from "../language/LanguageContext";
 import "./Game.css";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-
+import TextNarrator from "../textNarrator/TextNarrator";
+import { FiRotateCw } from 'react-icons/fi';
+import BackgroundMusic from "../backgroundMusic/BackgroundMusic";
 
 interface GameProps {
   userToken: string;
 }
-
-
-function splitTextIntoChunks(text, maxChunkSize) {
-  const words = text.split(' ');
-  const chunks = [];
-  let currentChunk = '';
-
-  words.forEach(word => {
-    if (currentChunk.length + word.length <= maxChunkSize) {
-      currentChunk += ' ' + word;
-    } else {
-      chunks.push(currentChunk.trim());
-      currentChunk = word;
-    }
-  });
-
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk.trim());
-  }
-
-  return chunks;
-}
-
-const speak = (text: string, voice: SpeechSynthesisVoice) => {
-  // Limpiar el array de utterances
-  window.utterances = [];
-  speechSynthesis.cancel();
-  // Dividir el texto en fragmentos, sin dividir las palabras a la mitad
-  const maxChunkSize = 120;
-  const textChunks = splitTextIntoChunks(text, maxChunkSize);
-
-  // Función para hablar un fragmento y programar el siguiente fragmento
-  const speakChunk = (index: number) => {
-    if (index < textChunks.length) {
-      const utterance = new SpeechSynthesisUtterance(textChunks[index]);
-      utterance.voice = voice; // Establecer la voz en la instancia de SpeechSynthesisUtterance
-      window.utterances.push(utterance);
-
-      utterance.onend = () => {
-        speakChunk(index + 1);
-      };
-
-      speechSynthesis.speak(utterance);
-    }
-  };
-
-  // Iniciar la narración
-  speakChunk(0);
-};
-
 
 const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
 
@@ -73,6 +25,9 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
 
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [gameContent, setGameContent] = useState<string[]>([]);
+  const [actualContent, setActualContent] = useState<string>(null);
+
+  const audioFile = process.env.PUBLIC_URL + '/music/fantasyMusic.mp3';
 
   const updateVoices = () => {
     const availableVoices = window.speechSynthesis.getVoices();
@@ -84,7 +39,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
 
   useEffect(() => {
     window.speechSynthesis.addEventListener("voiceschanged", updateVoices);
-    updateVoices(); // Llama a updateVoices una vez al inicio
+    updateVoices();
 
     return () => {
       // Limpia el eventListener al desmontar el componente
@@ -163,6 +118,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   async function startGame() {
     toggleSpinner(true);
     toggleOptions(false);
+    setActualContent(null);
 
     const introPrompt = t("intro_prompt", { gameType: gameType });
     const introText = await fetchChatGPTResponse(introPrompt, false);
@@ -180,11 +136,11 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
       const checkVoicesInterval = setInterval(() => {
         if (voicesLoaded) {
           clearInterval(checkVoicesInterval);
-          speak(newText, selectedVoice);
+          setActualContent(newText);
         }
       }, 100);
     } else {
-      speak(newText, selectedVoice);
+      setActualContent(newText);
     }
     for (let i = 0; i < 3; i++) {
       const optionButton = [option1, option2, option3][i].current;
@@ -203,6 +159,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   async function sendChoice(choice) {
     toggleOptions(false);
     toggleSpinner(true);
+    setActualContent(null);
 
     const prompt = `Elegiste la opción ${choice}. ¿Qué sucede a continuación?`;
 
@@ -219,7 +176,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
     }
 
     setGameContent((prev) => [...prev, newText]);
-    speak(newText, selectedVoice)
+    setActualContent(newText);
 
     setGameHistory((prevHistory) =>
       prevHistory.concat(
@@ -264,15 +221,15 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
       }),
     };
     try {
-      // const data = { "id": "chatcmpl-7Dty0ia7TwnFjzH0qS5tYqp4vev1A", "object": "chat.completion", "created": 1683547756, "model": "gpt-3.5-turbo-0301", "usage": { "prompt_tokens": 155, "completion_tokens": 112, "total_tokens": 267 }, "choices": [{ "message": { "role": "assistant", "content": "Te encuentras en una nave espacial en el año 2050, eres parte de una misión para explorar nuevos planetas y encontrar posibles lugares donde puedan vivir los humanos. De pronto, la nave empieza a sacudirse y escuchas una alarma sonar. Tienes que tomar una decisión:\n\n1) Ir a investigar el origen de la alarma\n2) Pedir ayuda al equipo\n3) Permanecer en tu lugar y esperar a que alguien te diga qué hacer" }, "finish_reason": "stop", "index": 0 }] }
+      const data = { "id": "chatcmpl-7Dty0ia7TwnFjzH0qS5tYqp4vev1A", "object": "chat.completion", "created": 1683547756, "model": "gpt-3.5-turbo-0301", "usage": { "prompt_tokens": 155, "completion_tokens": 112, "total_tokens": 267 }, "choices": [{ "message": { "role": "assistant", "content": "Te encuentras en una nave espacial en el año 2050, eres parte de una misión para explorar nuevos planetas y encontrar posibles lugares donde puedan vivir los humanos. De pronto, la nave empieza a sacudirse y escuchas una alarma sonar. Tienes que tomar una decisión:\n\n1) Ir a investigar el origen de la alarma\n2) Pedir ayuda al equipo\n3) Permanecer en tu lugar y esperar a que alguien te diga qué hacer" }, "finish_reason": "stop", "index": 0 }] }
 
       // Uncomment this to make the proper call
-      const response = await fetch(url, requestOptions);
-      if (response.status === 429) {
-        console.error("Error 429: Límite de velocidad alcanzado");
-        return "Lo siento, se ha alcanzado el límite de solicitudes permitidas en este momento. Por favor, intenta de nuevo más tarde.";
-      }
-      const data = await response.json();
+      // const response = await fetch(url, requestOptions);
+      // if (response.status === 429) {
+      //   console.error("Error 429: Límite de velocidad alcanzado");
+      //   return "Lo siento, se ha alcanzado el límite de solicitudes permitidas en este momento. Por favor, intenta de nuevo más tarde.";
+      // }
+      // const data = await response.json();
       const output = data.choices[0].message.content.trim();
 
       if (addToHistory) {
@@ -321,6 +278,15 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
   };
   return (
     <>
+      <div className="tools-buttons-container">
+        <div>
+          <BackgroundMusic audioFile={audioFile} />
+          {(voicesLoaded && actualContent != null) && <TextNarrator text={actualContent} voice={selectedVoice} />}
+        </div>
+        <button onClick={resetGame} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+          <FiRotateCw color="white" size={30} />
+        </button >
+      </div>
       <div ref={gameCarousel}>
         <Carousel
           showArrows={true}
@@ -342,7 +308,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
         <button ref={option1} onClick={() => sendChoice(1)}>Opción 1</button>
         <button ref={option2} onClick={() => sendChoice(2)}>Opción 2</button>
         <button ref={option3} onClick={() => sendChoice(3)}>Opción 3</button>
-        <button onClick={resetGame}>{t('reset')}</button>
+        {/* <button onClick={resetGame}>{t('reset')}</button> */}
       </div>
     </>
   );
