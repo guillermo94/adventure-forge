@@ -298,7 +298,7 @@ const Game: React.FC<GameProps> = ({ userToken }): React.ReactElement => {
         >
           {gameContent.map((item, index) => (
             <div id="game-content" key={index}>
-              <p >{item}</p>
+              <p>{item}</p>
             </div>
           ))}
         </Carousel>
